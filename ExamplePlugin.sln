@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlugin\ExamplePlugin.csproj", "{6FD4E422-03E0-4958-BD44-F860EFC238EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speedscanner", "Speedscanner\Speedscanner.csproj", "{07BAD3C3-1EEC-401F-9C54-EB6C35098EA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6FD4E422-03E0-4958-BD44-F860EFC238EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FD4E422-03E0-4958-BD44-F860EFC238EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FD4E422-03E0-4958-BD44-F860EFC238EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FD4E422-03E0-4958-BD44-F860EFC238EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07BAD3C3-1EEC-401F-9C54-EB6C35098EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07BAD3C3-1EEC-401F-9C54-EB6C35098EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07BAD3C3-1EEC-401F-9C54-EB6C35098EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07BAD3C3-1EEC-401F-9C54-EB6C35098EA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

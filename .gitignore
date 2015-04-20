@@ -1,0 +1,7 @@
+/packages/MahApps.Metro.1.1.2.0
+/*.suo
+/ExamplePlugin/bin/Debug
+/Speedscanner/bin/Debug
+/Speedscanner/obj/Debug
+/ExamplePlugin/obj/Debug
+/ExamplePlugin/*.suo
