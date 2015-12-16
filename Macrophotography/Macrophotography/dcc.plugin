@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<PluginInfo>
+  <Name>Macrophotography</Name>
+  <Author>Duka Istvan</Author>
+  <Id>{C6AFD801-BF88-4534-9A47-4142C0EE8F97}</Id>
+  <Version>1.0</Version>
+  <Description>Plugin to control external macro device</Description>
+  <AssemblyFileName>Macrophotography.dll</AssemblyFileName>
+</PluginInfo>
