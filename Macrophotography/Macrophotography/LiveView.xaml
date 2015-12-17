@@ -9,7 +9,7 @@
              d:DesignHeight="500" d:DesignWidth="729.851">
     <Window.DataContext>
         <macrophotography:LiveViewViewModel/>
-    </Window.DataContext>    
+    </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -26,9 +26,13 @@
             <ColumnDefinition Width="119*"/>
             <ColumnDefinition Width="338*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Live view" HorizontalAlignment="Stretch" Height="91" Margin="10" VerticalAlignment="Top" >
-            
-            </GroupBox>
+        <GroupBox Header="Live view" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Top" >
+            <StackPanel Orientation="Vertical">
+                <Button Content="Start live view" Command="{Binding StartLiveViewCommand}" Margin="5"/>
+                <Button Content="Stop live view" Command="{Binding StopLiveViewCommand}" Margin="5" />
+            </StackPanel>
+        </GroupBox>
+        <Image Grid.Row="0" Grid.Column="1" Margin="5" Stretch="Uniform" Source="{Binding Bitmap}"/>
 
     </Grid>
 </controls:MetroWindow>
