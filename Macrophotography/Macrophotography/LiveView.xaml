@@ -5,34 +5,104 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:macrophotography="clr-namespace:Macrophotography"
+             xmlns:translation="clr-namespace:CameraControl.Core.Translation;assembly=CameraControl.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="729.851">
+             d:DesignHeight="742.898" d:DesignWidth="1006.84">
     <Window.DataContext>
         <macrophotography:LiveViewViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="55*"/>
-            <RowDefinition Height="12*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="119*"/>
-            <ColumnDefinition Width="338*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Live view" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Top" >
+        <Image Grid.Row="0" Grid.Column="1" Margin="5" Stretch="Uniform" Source="{Binding Bitmap}"/>
+        <GroupBox Header="Live view" HorizontalAlignment="Stretch" Margin="579,10,10,0" VerticalAlignment="Top" Grid.Column="1" >
             <StackPanel Orientation="Vertical">
                 <Button Content="Start live view" Command="{Binding StartLiveViewCommand}" Margin="5"/>
                 <Button Content="Stop live view" Command="{Binding StopLiveViewCommand}" Margin="5" />
             </StackPanel>
         </GroupBox>
-        <Image Grid.Row="0" Grid.Column="1" Margin="5" Stretch="Uniform" Source="{Binding Bitmap}"/>
+        <Expander Grid.Row="0" Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Width="200" Padding="0">
+            <ScrollViewer>
+                <StackPanel Orientation="Vertical">
+                    <Expander Header="Luminosity" Height="100">
+
+                    </Expander>
+                    <Expander Header="Control" IsExpanded="True" >
+                        <StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.FNumber.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension Aperture}" Target="{Binding ElementName=cmb_aperture}"/>
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.FNumber.ErrorColor}" >
+                                    <ComboBox IsEnabled="{Binding Path=SelectedCameraDevice.FNumber.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.FNumber.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.FNumber.Value}"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.IsoNumber.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension Iso}" Target="{Binding ElementName=cmb_iso}" />
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.IsoNumber.ErrorColor}" >
+                                    <ComboBox Name="cmb_iso" IsEnabled="{Binding Path=SelectedCameraDevice.IsoNumber.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.IsoNumber.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.IsoNumber.Value}"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.ShutterSpeed.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension ShutterSpeed}" Target="{Binding ElementName=cmb_shutter}"/>
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.ShutterSpeed.ErrorColor}" >
+                                    <ComboBox Name="cmb_shutter" IsEnabled="{Binding Path=SelectedCameraDevice.ShutterSpeed.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.ShutterSpeed.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.ShutterSpeed.Value}" />
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.WhiteBalance.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension WhiteBalance}" Target="{Binding ElementName=cmb_WB}"/>
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.WhiteBalance.ErrorColor}" >
+                                    <ComboBox Name="cmb_WB" IsEnabled="{Binding Path=SelectedCameraDevice.WhiteBalance.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.WhiteBalance.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.WhiteBalance.Value}" ToolTip="{Binding Path=SelectedCameraDevice.WhiteBalance.Value}" />
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.ExposureCompensation.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension ExposureComp}" Target="{Binding ElementName=cmb_EComp}"/>
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.ExposureCompensation.ErrorColor}" >
+                                    <ComboBox Name="cmb_EComp" IsEnabled="{Binding Path=SelectedCameraDevice.ExposureCompensation.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.ExposureCompensation.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.ExposureCompensation.Value}"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.CompressionSetting.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension Compression}" Target="{Binding ElementName=cmb_com}"/>
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.CompressionSetting.ErrorColor}" >
+                                    <ComboBox Name="cmb_com" IsEnabled="{Binding Path=SelectedCameraDevice.CompressionSetting.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.CompressionSetting.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.CompressionSetting.Value}" ToolTip="{Binding Path=SelectedCameraDevice.CompressionSetting.Value}"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="1" Visibility="{Binding SelectedCameraDevice.ExposureMeteringMode.Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label Content="{translation:TranslateExtension MeteringMode}" Target="{Binding ElementName=cmb_meter}"/>
+                                <Border BorderThickness="1" BorderBrush="{Binding Path=SelectedCameraDevice.ExposureMeteringMode.ErrorColor}" >
+                                    <ComboBox Name="cmb_meter"  IsEnabled="{Binding Path=SelectedCameraDevice.ExposureMeteringMode.IsEnabled}" ItemsSource="{Binding Path=SelectedCameraDevice.ExposureMeteringMode.Values}" SelectedValue="{Binding Path=SelectedCameraDevice.ExposureMeteringMode.Value}" ToolTip="{Binding Path=SelectedCameraDevice.ExposureMeteringMode.Value}" />
+                                </Border>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Expander>
+                    <Expander Header="Display" >
+
+                    </Expander>
+
+                </StackPanel>
+            </ScrollViewer>
+
+        </Expander>
+        <Expander Grid.Row="1" Grid.Column="0" Header="Expander" Grid.ColumnSpan="2" ExpandDirection="Up" IsExpanded="True" Height="100">
+            <Grid />
+        </Expander>
 
     </Grid>
 </controls:MetroWindow>

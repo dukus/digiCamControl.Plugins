@@ -25,15 +25,17 @@ namespace Macrophotography
         private ICameraDevice _cameraDevice;
         private BitmapSource _bitmap;
 
-        public ICameraDevice CameraDevice
+        public ICameraDevice SelectedCameraDevice
         {
             get { return _cameraDevice; }
             set
             {
                 _cameraDevice = value;
-                RaisePropertyChanged(() => CameraDevice);
+                RaisePropertyChanged(() => SelectedCameraDevice);
             }
         }
+
+
 
         public BitmapSource Bitmap
         {
@@ -57,7 +59,7 @@ namespace Macrophotography
             StopLiveViewCommand = new RelayCommand(StopLiveView);
             _timer.AutoReset = true;
             _timer.Elapsed += _timer_Elapsed;
-            CameraDevice = ServiceProvider.DeviceManager.SelectedCameraDevice;
+            SelectedCameraDevice = ServiceProvider.DeviceManager.SelectedCameraDevice;
         }
 
         void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -72,7 +74,7 @@ namespace Macrophotography
 
             try
             {
-                LiveViewData = CameraDevice.GetLiveViewImage();
+                LiveViewData = SelectedCameraDevice.GetLiveViewImage();
             }
             catch (Exception ex)
             {
@@ -122,7 +124,7 @@ namespace Macrophotography
             //if (!IsActive)
             //    return;
 
-            string resp = CameraDevice.GetProhibitionCondition(OperationEnum.LiveView);
+            string resp = SelectedCameraDevice.GetProhibitionCondition(OperationEnum.LiveView);
             if (string.IsNullOrEmpty(resp))
             {
                 Thread thread = new Thread(StartLiveViewThread);
@@ -152,7 +154,7 @@ namespace Macrophotography
                 {
                     try
                     {
-                        CameraDevice.StartLiveView();
+                        SelectedCameraDevice.StartLiveView();
                     }
                     catch (DeviceException deviceException)
                     {
@@ -183,7 +185,7 @@ namespace Macrophotography
 
         private void StopLiveView()
         {
-            if (!CameraDevice.IsChecked)
+            if (!SelectedCameraDevice.IsChecked)
                 return;
             Thread thread = new Thread(StopLiveViewThread);
             thread.Start();
@@ -200,7 +202,7 @@ namespace Macrophotography
                 {
                     try
                     {
-                        CameraDevice.StopLiveView();
+                        SelectedCameraDevice.StopLiveView();
                     }
                     catch (DeviceException deviceException)
                     {

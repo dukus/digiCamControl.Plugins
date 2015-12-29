@@ -2,6 +2,6 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
-    <StartProgram>f:\devel\vs2010\CameraControl\CameraControl\bin\Debug\CameraControl.exe</StartProgram>
+    <StartProgram>d:\devel\vs2010\CameraControl\CameraControl\bin\Debug\CameraControl.exe</StartProgram>
   </PropertyGroup>
 </Project>
