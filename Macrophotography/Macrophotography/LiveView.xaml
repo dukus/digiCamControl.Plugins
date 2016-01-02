@@ -6,6 +6,7 @@
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:macrophotography="clr-namespace:Macrophotography"
              xmlns:translation="clr-namespace:CameraControl.Core.Translation;assembly=CameraControl.Core"
+             xmlns:wpf="clr-namespace:CameraControl.Core.Wpf;assembly=CameraControl.Core"
              mc:Ignorable="d" 
              d:DesignHeight="742.898" d:DesignWidth="1006.84">
     <Window.DataContext>
@@ -21,6 +22,41 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter1" />
+            <!-- MoveThumb Template -->
+            <ControlTemplate x:Key="MoveThumbTemplate" TargetType="{x:Type wpf:MoveThumb}">
+                <Rectangle Fill="Transparent"/>
+            </ControlTemplate>
+
+            <!-- ResizeDecorator Template -->
+            <ControlTemplate x:Key="ResizeDecoratorTemplate" TargetType="{x:Type Control}">
+                <Grid>
+                    <wpf:ResizeThumb Height="3" Cursor="SizeNS" Margin="0 -4 0 0"
+                       VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    <wpf:ResizeThumb Width="3" Cursor="SizeWE" Margin="-4 0 0 0"
+                       VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
+                    <wpf:ResizeThumb Width="3" Cursor="SizeWE" Margin="0 0 -4 0"
+                       VerticalAlignment="Stretch" HorizontalAlignment="Right"/>
+                    <wpf:ResizeThumb Height="3" Cursor="SizeNS" Margin="0 0 0 -4"
+                       VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
+                    <wpf:ResizeThumb Width="7" Height="7" Cursor="SizeNWSE" Margin="-6 -6 0 0"
+                       VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <wpf:ResizeThumb Width="7" Height="7" Cursor="SizeNESW" Margin="0 -6 -6 0"
+                       VerticalAlignment="Top" HorizontalAlignment="Right"/>
+                    <wpf:ResizeThumb Width="7" Height="7" Cursor="SizeNESW" Margin="-6 0 0 -6"
+                       VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                    <wpf:ResizeThumb Width="7" Height="7" Cursor="SizeNWSE" Margin="0 0 -6 -6"
+                       VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                </Grid>
+            </ControlTemplate>
+            <!-- Designer Item Template-->
+            <ControlTemplate x:Key="DesignerItemTemplate" TargetType="ContentControl">
+                <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                    <wpf:MoveThumb Template="{StaticResource MoveThumbTemplate}" Cursor="SizeAll"/>
+                    <Control Template="{StaticResource ResizeDecoratorTemplate}"/>
+                    <ContentPresenter Content="{TemplateBinding ContentControl.Content}"/>
+                </Grid>
+            </ControlTemplate>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -32,14 +68,45 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Image Grid.Row="0" Grid.Column="1" Margin="5" Stretch="Uniform" Source="{Binding Bitmap}"/>
+        <Image Grid.Row="0" Grid.Column="1" Margin="5" Stretch="Uniform" Source="{Binding Bitmap}" Name="_image" />
+
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.LayoutTransform>
+                <RotateTransform  Angle="{Binding Rotation}" />
+            </Grid.LayoutTransform>
+            <Viewbox Stretch="Fill" ClipToBounds="True" Width="{Binding ElementName=_image,Path=ActualWidth}" Height="{Binding ElementName=_image,Path=ActualHeight}"
+                 Visibility="{Binding SettingArea, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                <Canvas Width="1000" Height="1000">
+                    <Path Fill="#80000000">
+                        <Path.Data>
+                            <CombinedGeometry GeometryCombineMode="Xor">
+                                <CombinedGeometry.Geometry1>
+                                    <RectangleGeometry Rect="0,0,1000,1000"/>
+                                </CombinedGeometry.Geometry1>
+                                <CombinedGeometry.Geometry2>
+                                    <RectangleGeometry x:Name="transparentRect" Rect="{Binding RullerRect}"/>
+                                </CombinedGeometry.Geometry2>
+                            </CombinedGeometry>
+                        </Path.Data>
+                    </Path>
+                    <ContentControl Width="{Binding HorizontalMax, Mode=TwoWay}"
+                    Height="{Binding VerticalMax, Mode=TwoWay}"
+                    Canvas.Top="{Binding VerticalMin, Mode=TwoWay}"
+                    Canvas.Left="{Binding HorizontalMin, Mode=TwoWay}"
+                    Template="{StaticResource DesignerItemTemplate}">
+                        <!--<Rectangle Opacity="0.4" Fill="Black" IsHitTestVisible="False"/>-->
+                    </ContentControl>
+                </Canvas>
+            </Viewbox>
+        </Grid>
+
         <GroupBox Header="Live view" HorizontalAlignment="Stretch" Margin="579,10,10,0" VerticalAlignment="Top" Grid.Column="1" >
             <StackPanel Orientation="Vertical">
                 <Button Content="Start live view" Command="{Binding StartLiveViewCommand}" Margin="5"/>
                 <Button Content="Stop live view" Command="{Binding StopLiveViewCommand}" Margin="5" />
             </StackPanel>
         </GroupBox>
-        <Expander Grid.Row="0" Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Width="200" Padding="0">
+        <Expander Grid.Row="0" Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Width="250" Padding="0">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical">
                     <Expander Header="Luminosity" Height="100">
@@ -93,7 +160,23 @@
                         </StackPanel>
                     </Expander>
                     <Expander Header="Display" >
-
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="88*" />
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="90*" />
+                                <ColumnDefinition Width="5"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                            <CheckBox Content="{translation:TranslateExtension LabelShowActiveArea}" IsChecked="{Binding Path=ShowRuler}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="2"/>
+                            <Button Content="{translation:TranslateExtension LabelSetArea}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="2" HorizontalAlignment="Right" Command="{Binding SetAreaCommand}" Visibility="{Binding NoSettingArea, Converter={StaticResource BooleanToVisibilityConverter1}}"/>
+                            <Button Content="{translation:TranslateExtension LabelDoneArea}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="2" HorizontalAlignment="Right" Command="{Binding DoneSetAreaCommand}" Visibility="{Binding SettingArea, Converter={StaticResource BooleanToVisibilityConverter1}}"/>
+                        </Grid>
                     </Expander>
 
                 </StackPanel>

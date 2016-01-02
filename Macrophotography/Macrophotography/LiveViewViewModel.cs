@@ -5,15 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CameraControl.Core;
 using CameraControl.Core.Classes;
 using CameraControl.Core.Translation;
+using CameraControl.Core.Wpf;
 using CameraControl.Devices;
 using CameraControl.Devices.Classes;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Timer = System.Timers.Timer;
+
 
 namespace Macrophotography
 {
@@ -24,6 +28,8 @@ namespace Macrophotography
 
         private ICameraDevice _cameraDevice;
         private BitmapSource _bitmap;
+        private bool _settingArea;
+        private CameraProperty _cameraProperty;
 
         public ICameraDevice SelectedCameraDevice
         {
@@ -34,8 +40,87 @@ namespace Macrophotography
                 RaisePropertyChanged(() => SelectedCameraDevice);
             }
         }
+        
+        public bool ShowRuler
+        {
+            get { return CameraProperty.LiveviewSettings.ShowRuler; }
+            set
+            {
+                CameraProperty.LiveviewSettings.ShowRuler = value;
+                RaisePropertyChanged(() => ShowRuler);
+            }
+        }
 
+        public bool SettingArea
+        {
+            get { return _settingArea; }
+            set
+            {
+                _settingArea = value;
+                RaisePropertyChanged(() => SettingArea);
+                RaisePropertyChanged(() => NoSettingArea);
+            }
+        }
 
+        public bool NoSettingArea
+        {
+            get { return !SettingArea; }
+        }
+
+        public Rect RullerRect
+        {
+            get { return new Rect(HorizontalMin, VerticalMin, HorizontalMax, VerticalMax); }
+        }
+
+        public int HorizontalMin
+        {
+            get { return CameraProperty.LiveviewSettings.HorizontalMin; }
+            set
+            {
+                CameraProperty.LiveviewSettings.HorizontalMin = value;
+                RaisePropertyChanged(() => RullerRect);
+            }
+        }
+
+        public int HorizontalMax
+        {
+            get { return CameraProperty.LiveviewSettings.HorizontalMax; }
+            set
+            {
+                CameraProperty.LiveviewSettings.HorizontalMax = value;
+                RaisePropertyChanged(() => RullerRect);
+            }
+        }
+
+        public int VerticalMin
+        {
+            get { return CameraProperty.LiveviewSettings.VerticalMin; }
+            set
+            {
+                CameraProperty.LiveviewSettings.VerticalMin = value;
+                RaisePropertyChanged(() => RullerRect);
+            }
+        }
+
+        public CameraProperty CameraProperty
+        {
+            get { return _cameraProperty; }
+            set
+            {
+                _cameraProperty = value;
+                RaisePropertyChanged(() => CameraProperty);
+            }
+        }
+
+        public int VerticalMax
+        {
+            get { return CameraProperty.LiveviewSettings.VerticalMax; }
+            set
+            {
+                CameraProperty.LiveviewSettings.VerticalMax = value;
+                RaisePropertyChanged(() => RullerRect);
+            }
+        }
 
         public BitmapSource Bitmap
         {
@@ -53,13 +138,23 @@ namespace Macrophotography
         public RelayCommand StartLiveViewCommand { get; set; }
         public RelayCommand StopLiveViewCommand { get; set; }
 
+        public RelayCommand SetAreaCommand { get; set; }
+        public RelayCommand DoneSetAreaCommand { get; set; }
+
         public LiveViewViewModel()
         {
             StartLiveViewCommand = new RelayCommand(StartLiveView);
             StopLiveViewCommand = new RelayCommand(StopLiveView);
+            SetAreaCommand = new RelayCommand(() => SettingArea = true);
+            DoneSetAreaCommand = new RelayCommand(() => SettingArea = false);
+
             _timer.AutoReset = true;
             _timer.Elapsed += _timer_Elapsed;
-            SelectedCameraDevice = ServiceProvider.DeviceManager.SelectedCameraDevice;
+            if (!IsInDesignMode)
+            {
+                SelectedCameraDevice = ServiceProvider.DeviceManager.SelectedCameraDevice;
+                CameraProperty = SelectedCameraDevice.LoadProperties();
+            }
         }
 
         void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -106,7 +201,10 @@ namespace Macrophotography
                     bi.StreamSource = stream;
                     bi.EndInit();
                     bi.Freeze();
-                    Bitmap = bi;
+                    WriteableBitmap bitmap = BitmapFactory.ConvertToPbgra32Format(bi);
+                    DrawGrid(bitmap);
+                    bitmap.Freeze();
+                    Bitmap = bitmap;
                     _operInProgress = false;
                     return;
                 }
@@ -117,6 +215,26 @@ namespace Macrophotography
                 _operInProgress = false;
                 return;
             }
+        }
+
+        private void DrawGrid(WriteableBitmap writeableBitmap)
+        {
+            System.Windows.Media.Color color = Colors.White;
+            color.A = 50;
+
+            if (ShowRuler && NoSettingArea)
+            {
+                int x1 = writeableBitmap.PixelWidth * (HorizontalMin) / 1000;
+                int x2 = writeableBitmap.PixelWidth * (HorizontalMin + HorizontalMax) / 1000;
+                int y2 = writeableBitmap.PixelHeight * (VerticalMin + VerticalMax) / 1000;
+                int y1 = writeableBitmap.PixelHeight * VerticalMin / 1000;
+
+                writeableBitmap.FillRectangle2(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight, System.Windows.Media.Color.FromArgb(128, 128, 128, 128));
+                writeableBitmap.FillRectangleDeBlend(x1, y1, x2, y2, System.Windows.Media.Color.FromArgb(128, 128, 128, 128));
+                writeableBitmap.DrawRectangle(x1, y1, x2, y2, color);
+
+            }
+
         }
 
         private void StartLiveView()
