@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -17,7 +15,6 @@ using CameraControl.Devices.Classes;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Timer = System.Timers.Timer;
-
 
 namespace Macrophotography
 {
@@ -157,7 +154,7 @@ namespace Macrophotography
             }
         }
 
-        void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             Task.Factory.StartNew(GetLiveImage);
         }
@@ -219,7 +216,7 @@ namespace Macrophotography
 
         private void DrawGrid(WriteableBitmap writeableBitmap)
         {
-            System.Windows.Media.Color color = Colors.White;
+            Color color = Colors.White;
             color.A = 50;
 
             if (ShowRuler && NoSettingArea)
@@ -229,8 +226,8 @@ namespace Macrophotography
                 int y2 = writeableBitmap.PixelHeight * (VerticalMin + VerticalMax) / 1000;
                 int y1 = writeableBitmap.PixelHeight * VerticalMin / 1000;
 
-                writeableBitmap.FillRectangle2(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight, System.Windows.Media.Color.FromArgb(128, 128, 128, 128));
-                writeableBitmap.FillRectangleDeBlend(x1, y1, x2, y2, System.Windows.Media.Color.FromArgb(128, 128, 128, 128));
+                writeableBitmap.FillRectangle2(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight, Color.FromArgb(128, 128, 128, 128));
+                writeableBitmap.FillRectangleDeBlend(x1, y1, x2, y2, Color.FromArgb(128, 128, 128, 128));
                 writeableBitmap.DrawRectangle(x1, y1, x2, y2, color);
 
             }
